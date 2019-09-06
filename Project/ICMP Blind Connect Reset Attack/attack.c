@@ -83,7 +83,16 @@ void send_raw_ip_packet(struct ipheader* ip){
 
 
 
-int main(){
+int main(int argc, char **argv){
+
+	char source[20],destination[20];
+
+	strcpy(source,argv[1]);
+	strcpy(destination,argv[2]);
+
+	printf("%s\n",source );
+	printf("%s\n",destination );
+
 
 	char buffer[1500];
 
@@ -111,8 +120,8 @@ int main(){
 	ip->iph_ver = 4;
 	ip->iph_ihl = 5;
 	ip->iph_ttl = 20;
-	ip->iph_sourceip.s_addr = inet_addr("192.168.0.106");
-	ip->iph_destip.s_addr = inet_addr("192.168.0.100");
+	ip->iph_sourceip.s_addr = inet_addr(source);
+	ip->iph_destip.s_addr = inet_addr(destination);
 	ip->iph_protocol = IPPROTO_ICMP;
 	ip->iph_len = htons(sizeof(struct ipheader) + sizeof(struct icmpheader));
 
