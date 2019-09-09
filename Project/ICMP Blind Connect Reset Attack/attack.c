@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 
 /* IP Header */
@@ -86,12 +87,13 @@ void send_raw_ip_packet(struct ipheader* ip){
 int main(int argc, char **argv){
 
 	char source[20],destination[20];
+	int packet_count= 10000;
 
 	strcpy(source,argv[1]);
 	strcpy(destination,argv[2]);
 
-	printf("%s\n",source );
-	printf("%s\n",destination );
+	printf("Source IP of the ICMP Packet: %s\n",source );
+	printf("Destination IP of the ICMP Packet:%s\n",destination );
 
 
 	char buffer[1500];
@@ -100,21 +102,12 @@ int main(int argc, char **argv){
 
 	int i;
 
-
-	/***********************************************************************************
-		Step-1 :Fill in the ICMP Header.
-	***********************************************************************************/
-
 	struct icmpheader *icmp = (struct icmpheader *) (buffer + sizeof(struct ipheader));
 	icmp->icmp_type = 3;
 	icmp->icmp_code = 1;
 	icmp->icmp_chksum = 0;
 	icmp->icmp_chksum = in_cksum((unsigned short *)icmp,sizeof(struct icmpheader));
 
-
-	/*********************************************************************************
-		Step-2 : Fill in the IP Header.
-	*********************************************************************************/
 
 	struct ipheader *ip = (struct ipheader *) buffer;
 	ip->iph_ver = 4;
@@ -125,12 +118,16 @@ int main(int argc, char **argv){
 	ip->iph_protocol = IPPROTO_ICMP;
 	ip->iph_len = htons(sizeof(struct ipheader) + sizeof(struct icmpheader));
 
-	/***********************************************************************************
-		Step-3 : Finally,send the packet.
-	***********************************************************************************/
-	for(i = 0; i<20; i++){
-		send_raw_ip_packet (ip);
+	
+
+	for(i=0;i<=packet_count;i++){
+
+		sleep(0.5);
+		send_raw_ip_packet(ip);
 	}
+
+	printf("Total %d packets sent....... \n",packet_count);
+	
 	return 0;
 
 
